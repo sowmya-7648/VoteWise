@@ -41,6 +41,36 @@ const voteForCandidate = async (req, res) => {
         res.status(500).json({ message: "Server error", error: error.message }); // ✅ Ensure JSON response
     }
 };
+const getElectionWinner = async (req, res) => {
+    try {
+        const { electionId } = req.params;
+
+        const votes = await Vote.aggregate([
+            { $match: { electionId: new mongoose.Types.ObjectId(electionId) } },
+            { $group: { _id: "$candidateId", count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
+            { $limit: 1 }
+        ]);
+
+        if (!votes.length) {
+            return res.status(404).json({ message: "No votes found for this election" });
+        }
+
+        const winner = await Candidate.findById(votes[0]._id);
+
+        res.status(200).json({
+            winner: {
+                candidateId: winner._id,
+                candidateName: winner.name,
+                voteCount: votes[0].count,
+            }
+        });
+    } catch (error) {
+        console.error("Error fetching winner:", error);
+        res.status(500).json({ message: "Failed to fetch winner", error: error.message });
+    }
+};
+
 
 
 // 📌 **Get Election Results**
@@ -77,8 +107,10 @@ const getElectionResults = async (req, res) => {
 
 const getAllElectionResults = async (req, res) => {
     try {
-        // Fetch all elections
-        const elections = await Election.find();
+        // Fetch only elections that are either Ongoing or Ended
+        const elections = await Election.find({
+            status: { $in: ["Ongoing", "Ended"] }
+        });
 
         let results = [];
 
@@ -87,25 +119,37 @@ const getAllElectionResults = async (req, res) => {
             const votes = await Vote.aggregate([
                 { $match: { electionId: election._id } },
                 { $group: { _id: "$candidateId", count: { $sum: 1 } } },
-                { $sort: { count: -1 } } // Sort by highest votes
+                { $sort: { count: -1 } }
             ]);
 
-            if (votes.length === 0) continue; // No votes in this election
+            // Skip if no votes yet
+            if (votes.length === 0) {
+                results.push({
+                    electionId: election._id,
+                    electionName: election.name,
+                    status: election.status,
+                    winner: null,
+                    message: "No votes yet"
+                });
+                continue;
+            }
 
-            // Get the winner (candidate with the highest votes)
+            // Get winner details
             const winner = await Candidate.findById(votes[0]._id);
 
             results.push({
                 electionId: election._id,
                 electionName: election.name,
+                status: election.status,
                 winner: {
                     name: winner.name,
+                    candidateId: winner._id,
                     votes: votes[0].count
                 }
             });
         }
 
-        res.json(results);
+        res.status(200).json({ results });
     } catch (error) {
         console.error("Error fetching election results:", error);
         res.status(500).json({ message: "Failed to fetch results", error: error.message });
@@ -113,7 +157,16 @@ const getAllElectionResults = async (req, res) => {
 };
 
 
+// Example controller
+const checkVoteStatus = async (req, res) => {
+    const userId = req.user.userId; // from JWT middleware
+    const { electionId } = req.params;
+
+    const vote = await Vote.findOne({ user: userId, election: electionId });
+    res.json({ alreadyVoted: !!vote });
+};
 
 
 
-module.exports = { voteForCandidate, getElectionResults, getAllElectionResults };
+
+module.exports = { voteForCandidate, getElectionResults, getAllElectionResults, checkVoteStatus, getElectionWinner };

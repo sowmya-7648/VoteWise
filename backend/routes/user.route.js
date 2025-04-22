@@ -1,5 +1,5 @@
 const express = require("express");
-const { registerUser, verifyOTP, loginUser, verifyLoginOTP, getUserProfile } = require("../controllers/user.controller");
+const { registerUser, verifyOTP, loginUser, verifyLoginOTP, getUserProfile, getUser } = require("../controllers/user.controller");
 const authMiddleware = require("../middleware/authMiddleware"); // Ensure correct path
 
 const router = express.Router();
@@ -14,5 +14,7 @@ router.post("/verify-login-otp", verifyLoginOTP);
 
 // Protected profile route
 router.get("/profile", authMiddleware, getUserProfile);
+
+router.get('/get-user', authMiddleware, getUser)
 
 module.exports = router;

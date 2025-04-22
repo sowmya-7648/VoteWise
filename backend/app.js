@@ -1,6 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
+const path = require("path");
+
 const cors = require("cors");
 
 const userRoutes = require("./routes/user.route");
@@ -31,6 +33,8 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ message: "Something went wrong!", error: err.message });
 });
+
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 // Start Server
 const PORT = process.env.PORT || 8001;

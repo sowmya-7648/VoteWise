@@ -1,14 +1,15 @@
 const express = require("express");
-const authMiddleware = require("../middleware/authMiddleware"); // Corrected import
-const { createElection, getElections, getOngoingElections } = require("../controllers/election.controller");
-
 const router = express.Router();
+const electionController = require("../controllers/election.controller");
 
-// 📌 **Public route to fetch all elections**
-router.get("/", getElections);
+// POST /api/elections
+router.post("/", electionController.createElection);
 
-// 📌 **Admin-only route to create an election**
-router.post("/create", authMiddleware, createElection);
-router.get("/ongoing", getOngoingElections);
+// GET /api/elections
+router.get("/", electionController.getElections);
+router.get("/ongoing", electionController.getOngoingElections);
+router.get("/status", electionController.getElectionsByStatus);
+router.get("/ongoing-with-winners", electionController.getOngoingElectionsWithWinners);
+
 
 module.exports = router;

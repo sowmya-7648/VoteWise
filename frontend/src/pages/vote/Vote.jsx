@@ -28,27 +28,27 @@ const Vote = () => {
     }, []);
 
     return (
-        <div className="container mx-auto p-6">
-            <h1 className="text-3xl font-bold mb-4">Ongoing Elections</h1>
+        <div className="container mx-auto p-6 bg-indigo-100">
+            <h1 className="text-3xl font-bold text-center text-indigo-600 mb-6">🗳️ Ongoing Elections</h1>
 
-            {loading && <p>Loading ongoing elections...</p>}
-            {error && <p className="text-red-500">{error}</p>}
+            {loading && <p className="text-center text-gray-500 animate-pulse">Fetching elections...</p>}
+            {error && <p className="text-center text-indigo-500">{error}</p>}
 
             {!loading && !error && ongoingElections.length === 0 && (
-                <p>No ongoing elections at the moment.</p>
+                <p className="text-center text-gray-500">No ongoing elections at the moment. 🕒</p>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {ongoingElections.map((election) => (
-                    <div key={election._id} className="p-4 border rounded-lg shadow-md bg-white">
-                        <h2 className="text-xl font-semibold">{election.name}</h2>
+                    <div key={election._id} className="p-5 border border-indigo-300 rounded-lg shadow-lg bg-white">
+                        <h2 className="text-xl font-bold text-indigo-700">{election.name}</h2>
                         <p className="text-gray-600">{election.description}</p>
                         <p className="text-sm text-gray-500">
-                            Ends on: {new Date(election.endDate).toLocaleDateString()}
+                            🏁 Ends on: <span className="font-semibold">{new Date(election.endDate).toLocaleDateString()}</span>
                         </p>
                         <Link
                             to={`/vote/${election._id}`}
-                            className="mt-3 inline-block bg-rose-500 text-white px-4 py-2 rounded-md hover:bg-rose-600 transition"
+                            className="mt-3 inline-block bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition"
                         >
                             View Candidates
                         </Link>

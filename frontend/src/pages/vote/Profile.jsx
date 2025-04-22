@@ -15,14 +15,14 @@ function Profile() {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`, // ✅ Send token
+                        Authorization: `Bearer ${token}`,
                     },
                 });
 
                 if (!response.ok) throw new Error("Failed to fetch profile");
 
                 const data = await response.json();
-                setUser(data); // ✅ Set user state
+                setUser(data);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -33,21 +33,51 @@ function Profile() {
         fetchProfile();
     }, []);
 
-    if (loading) return <p className="text-center">Loading...</p>;
-    if (error) return <p className="text-center text-red-500">{error}</p>;
+    if (loading)
+        return <p className="text-center text-gray-500 animate-pulse">Loading profile...</p>;
+    if (error)
+        return <p className="text-center text-red-500">{error}</p>;
 
     return (
-        <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold mb-4 text-center">My Profile</h2>
+        <div className="max-w-lg mx-auto mt-10 bg-white p-6 rounded-2xl shadow-xl border border-indigo-200">
+            <h2 className="text-3xl font-extrabold text-center text-indigo-600 mb-6">
+                My Profile
+            </h2>
+
             {user ? (
-                <>
-                    <p><strong>Name:</strong> {user.name}</p>
-                    <p><strong>Email:</strong> {user.email}</p>
-                    <p><strong>Age:</strong> {user.age}</p>
-                    <p><strong>Voter ID:</strong> {user.voterId}</p>
-                    <p><strong>Role:</strong> {user.role}</p>
-                    <p><strong>Verified:</strong> {user.isVerified ? "✅ Yes" : "❌ No"}</p>
-                </>
+                <div className="space-y-6">
+                    {/* Avatar */}
+                    <div className="flex items-center justify-center">
+                        <div className="w-24 h-24 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-3xl font-bold shadow-md">
+                            {user.name.charAt(0)}
+                        </div>
+                    </div>
+
+                    {/* Info */}
+                    <div className="space-y-3 text-gray-800">
+                        <p><strong>Name:</strong> {user.name}</p>
+                        <p><strong>Email:</strong> {user.email}</p>
+                        <p><strong>Age:</strong> {user.age}</p>
+                        <p><strong>Voter ID:</strong> {user.voterId}</p>
+
+                        <div>
+                            <strong>Role:</strong>
+                            <span className="ml-2 inline-block px-3 py-1 text-sm font-semibold rounded-full bg-indigo-100 text-indigo-600">
+                                {user.role}
+                            </span>
+                        </div>
+
+                        <div>
+                            <strong>Verified:</strong>
+                            <span className={`ml-2 inline-block px-3 py-1 text-sm font-semibold rounded-full
+                                ${user.isVerified
+                                    ? "bg-green-100 text-green-600"
+                                    : "bg-red-100 text-red-600"}`}>
+                                {user.isVerified ? "✅ Verified" : "❌ Not Verified"}
+                            </span>
+                        </div>
+                    </div>
+                </div>
             ) : (
                 <p className="text-center text-gray-500">No user data available</p>
             )}
