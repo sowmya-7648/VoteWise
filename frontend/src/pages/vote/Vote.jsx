@@ -43,9 +43,9 @@ const Vote = () => {
                     <div key={election._id} className="p-5 border border-indigo-300 rounded-lg shadow-lg bg-white">
                         <h2 className="text-xl font-bold text-indigo-700">{election.name}</h2>
                         <p className="text-gray-600">{election.description}</p>
-                        <p className="text-sm text-gray-500">
+                        {/* <p className="text-sm text-gray-500">
                             🏁 Ends on: <span className="font-semibold">{new Date(election.endDate).toLocaleDateString()}</span>
-                        </p>
+                        </p> */}
                         <Link
                             to={`/vote/${election._id}`}
                             className="mt-3 inline-block bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition"
